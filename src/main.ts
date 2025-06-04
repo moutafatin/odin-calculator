@@ -2,6 +2,11 @@ import './style.css'
 import { operate, type Operand } from "./calculator"
 
 
+type Token = { type: 'number', value: number } | { type: 'operator', value: string }
+
+let runningOperation: Token[] = []
+let justEvaluated = false
+
 
 
 const digitBtns = document.querySelectorAll(".digit-btn") as NodeListOf<HTMLButtonElement>
@@ -10,50 +15,86 @@ const resultBtn = document.querySelector(".result-btn") as HTMLButtonElement
 const resultElm = document.querySelector(".calculator__result") as HTMLSpanElement
 
 const clearBtn = document.querySelector(".clear-btn") as HTMLButtonElement
+const backspaceBtn = document.querySelector(".backspace-btn") as HTMLButtonElement
 
 clearBtn.addEventListener("click", handleClear)
+backspaceBtn.addEventListener("click", handleBackspace)
 
-let resultPressed = false
+
+function handleClear() {
+  runningOperation = []
+  buffer = ""
+  resultElm.textContent = "0"
+  justEvaluated = false
+  updateCurrentOperationDisplay()
+}
+
+function handleBackspace() {
+  if (justEvaluated) return
+
+  if (runningOperation.length === 2 && !buffer) {
+    runningOperation.pop()
+    currentOperationDisplay.textContent = getCalculationText() + buffer
+    return
+  }
+
+  buffer = buffer.slice(0, -1)
+
+  currentOperationDisplay.textContent = getCalculationText() + buffer
+
+}
 
 const currentOperationDisplay = document.querySelector(".current-operation") as HTMLSpanElement
 resultBtn.addEventListener("click", () => {
+  if (buffer) {
+    runningOperation.push({ type: "number", value: +buffer })
+    buffer = ""
 
-  if (!prevOperation) return
-  if (+secondOperand === 0) {
-    // TODO: add UI element to show error
-    alert("You can't divide by 0")
-    handleClear()
-    return
   }
-  const result = operate(prevOperation as Operand, +firstOperand, +secondOperand).toString()
-  resultElm.textContent = result
-  firstOperand = result
-  prevOperation = ""
-  secondOperand = ""
-  resultPressed = true
+
+  if (runningOperation.length === 3) {
+    resultElm.textContent = evaluate(runningOperation).toString()
+    updateCurrentOperationDisplay()
+    runningOperation = [{ type: 'number', value: evaluate(runningOperation) }]
+
+    justEvaluated = true
+  }
+
+
 })
 
-let firstOperand = ""
-let secondOperand = ""
-let prevOperation = ""
+
+
+let buffer = ""
 
 digitBtns.forEach(digitBtn => {
   digitBtn.addEventListener("click", (e) => {
     const btn = e.currentTarget as HTMLButtonElement
+    buffer += btn.textContent
 
-    if (!prevOperation) {
-      firstOperand += btn.textContent
-      currentOperationDisplay.textContent += `${btn.textContent}`
 
-    } else {
-      secondOperand += btn.textContent
-      currentOperationDisplay.textContent += `${btn.textContent}`
+    currentOperationDisplay.textContent = getCalculationText() + buffer
 
-    }
-
-    console.log(firstOperand, secondOperand, prevOperation)
   })
 })
+
+
+function getCalculationText() {
+  let text = ""
+
+  runningOperation.forEach(opr => {
+    text += `${opr.value} `
+  })
+  return text
+}
+
+
+
+
+function updateCurrentOperationDisplay() {
+  currentOperationDisplay.textContent = getCalculationText()
+
+}
 
 
 
@@ -63,42 +104,53 @@ operationBtns.forEach(operationBtn => {
   operationBtn.addEventListener("click", (e) => {
     const btn = e.currentTarget as HTMLButtonElement
 
-    const currentOperation = btn.textContent ?? ""
+    if (!buffer && runningOperation.length === 0) return
 
-    if (prevOperation && prevOperation === currentOperation) {
+    if (justEvaluated) {
+      justEvaluated = false
+      runningOperation.push({ type: 'operator', value: btn.textContent! })
+      updateCurrentOperationDisplay()
       return
-    } else if (prevOperation && prevOperation !== currentOperation) {
-      currentOperationDisplay.textContent = currentOperationDisplay.textContent?.replace(prevOperation, "") ?? ""
-
     }
 
-    prevOperation = btn.textContent ?? ""
+    if (buffer) {
+      runningOperation.push({ type: "number", value: +buffer })
+      buffer = ""
 
-    if (firstOperand && secondOperand && prevOperation) {
-      firstOperand = operate(prevOperation as Operand, +firstOperand, +secondOperand).toString()
-      secondOperand = ""
+      if (runningOperation.length === 3) {
+        runningOperation = [{ type: 'number', value: evaluate(runningOperation) }]
+      }
 
-    }
-
-    if (resultPressed && resultElm.textContent !== "0") {
-      currentOperationDisplay.textContent = resultElm.textContent
-      resultPressed = false
-
+      runningOperation.push({ type: 'operator', value: btn.textContent! })
+      updateCurrentOperationDisplay()
+      return
     }
 
 
-    currentOperationDisplay.textContent += ` ${prevOperation} `
+    const last = runningOperation[runningOperation.length - 1]
+    if (last?.type === 'operator') {
+      runningOperation.pop()
+    }
+    runningOperation.push({ type: 'operator', value: btn.textContent! })
+
+    console.log(runningOperation)
+    updateCurrentOperationDisplay()
+
 
   })
 })
 
 
+function evaluate(calculation: Token[]) {
+  const [a, op, b] = calculation
 
+  if (a.type !== 'number' || op.type !== 'operator' || b.type !== 'number') {
+    alert("SOMETHING WRONG HERE")
+    return 0
+  }
 
-function handleClear() {
-  firstOperand = ""
-  secondOperand = ""
-  prevOperation = ""
-  resultElm.textContent = "0"
-  currentOperationDisplay.textContent = ""
+  return operate(op.value as Operand, a.value, b.value)
 }
+
+
+
