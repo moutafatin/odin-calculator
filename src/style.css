@@ -1,1 +1,27 @@
 @import url(styles-reset.css);
+
+#app {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.calculator {
+  width: 400px;
+  border: 1px solid black;
+}
+
+.btns {
+  display: flex;
+  flex-wrap: wrap;
+}
+.calculator__btn {
+  padding: 1rem 2rem;
+  flex: 1;
+}
+
+.calculator__result {
+  display: block;
+  padding: 2rem;
+  text-align: right;
+}
