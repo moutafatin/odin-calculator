@@ -2,6 +2,10 @@
 
 This is a browser calculator created as a part of [The Odin Project's Foundations Course.](https://www.theodinproject.com/lessons/foundations-etch-a-sketch)
 
+## Live Demo
+
+- [Live Demo](https://moutafatin.github.io/odin-etch-a-sketch/)
+
 ## Screenshots
 
 ![screenshot](screenshots/image.png)
