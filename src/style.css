@@ -25,3 +25,10 @@
   padding: 2rem;
   text-align: right;
 }
+
+.current-operation {
+  display: block;
+
+  text-align: right;
+  padding: 1rem 2rem;
+}
