@@ -15,7 +15,7 @@ This is a browser calculator created as a part of [The Odin Project's Foundation
 
 - Dealing with complex boolean evaluation
 - That I need to improve more in problem solving.
-- Make sure to at least understand what I need to do plan a little bit before jumping mindlessly to coding
+- Make sure to at least understand what I need to do and plan a little bit before jumping mindlessly to coding
 
 ## Challenges Faced
 
