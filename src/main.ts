@@ -71,7 +71,7 @@ function evaluate(calculation: Token[]) {
     return 0;
   }
 
-  return operate(op.value as Operand, a.value, b.value);
+  return operate(op.value, a.value, b.value);
 }
 
 function handleOperationClick(e: MouseEvent) {
