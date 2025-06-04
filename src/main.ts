@@ -15,37 +15,43 @@ clearBtn.addEventListener("click", handleClear)
 
 let resultPressed = false
 
-const currentOperation = document.querySelector(".current-operation") as HTMLSpanElement
+const currentOperationDisplay = document.querySelector(".current-operation") as HTMLSpanElement
 resultBtn.addEventListener("click", () => {
 
-  if (!operation) return
-  const result = operate(operation as Operand, +firstOperand, +secondOperand).toString()
+  if (!prevOperation) return
+  if (+secondOperand === 0) {
+    // TODO: add UI element to show error
+    alert("You can't divide by 0")
+    handleClear()
+    return
+  }
+  const result = operate(prevOperation as Operand, +firstOperand, +secondOperand).toString()
   resultElm.textContent = result
   firstOperand = result
-  operation = ""
+  prevOperation = ""
   secondOperand = ""
   resultPressed = true
 })
 
 let firstOperand = ""
 let secondOperand = ""
-let operation = ""
+let prevOperation = ""
 
 digitBtns.forEach(digitBtn => {
   digitBtn.addEventListener("click", (e) => {
     const btn = e.currentTarget as HTMLButtonElement
 
-    if (!operation) {
+    if (!prevOperation) {
       firstOperand += btn.textContent
-      currentOperation.textContent += `${btn.textContent}`
+      currentOperationDisplay.textContent += `${btn.textContent}`
 
     } else {
       secondOperand += btn.textContent
-      currentOperation.textContent += `${btn.textContent}`
+      currentOperationDisplay.textContent += `${btn.textContent}`
 
     }
 
-    console.log(firstOperand, secondOperand, operation)
+    console.log(firstOperand, secondOperand, prevOperation)
   })
 })
 
@@ -57,22 +63,31 @@ operationBtns.forEach(operationBtn => {
   operationBtn.addEventListener("click", (e) => {
     const btn = e.currentTarget as HTMLButtonElement
 
-    operation = btn.textContent ?? ""
+    const currentOperation = btn.textContent ?? ""
 
-    if (firstOperand && secondOperand && operation) {
-      firstOperand = operate(operation as Operand, +firstOperand, +secondOperand).toString()
+    if (prevOperation && prevOperation === currentOperation) {
+      return
+    } else if (prevOperation && prevOperation !== currentOperation) {
+      currentOperationDisplay.textContent = currentOperationDisplay.textContent?.replace(prevOperation, "") ?? ""
+
+    }
+
+    prevOperation = btn.textContent ?? ""
+
+    if (firstOperand && secondOperand && prevOperation) {
+      firstOperand = operate(prevOperation as Operand, +firstOperand, +secondOperand).toString()
       secondOperand = ""
 
     }
 
     if (resultPressed && resultElm.textContent !== "0") {
-      currentOperation.textContent = resultElm.textContent
+      currentOperationDisplay.textContent = resultElm.textContent
       resultPressed = false
 
     }
 
 
-    currentOperation.textContent += ` ${operation} `
+    currentOperationDisplay.textContent += ` ${prevOperation} `
 
   })
 })
@@ -83,7 +98,7 @@ operationBtns.forEach(operationBtn => {
 function handleClear() {
   firstOperand = ""
   secondOperand = ""
-  operation = ""
+  prevOperation = ""
   resultElm.textContent = "0"
-  currentOperation.textContent = ""
+  currentOperationDisplay.textContent = ""
 }
