@@ -34,6 +34,6 @@ const operations: {
 
 
 
-export function operate(operand: Operand, firstOperand: number, secondOperand: number) {
-    return operations[operand](firstOperand, secondOperand)
+export function operate(operand: string, firstOperand: number, secondOperand: number) {
+    return operations[operand as Operand](firstOperand, secondOperand)
 }

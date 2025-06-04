@@ -1,5 +1,5 @@
 import "./style.css";
-import { operate, type Operand } from "./calculator";
+import { operate } from "./calculator";
 
 type Token =
   | { type: "number"; value: number }
